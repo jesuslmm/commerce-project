@@ -1,0 +1,25 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h1 class="header">Winned auctions</h1>
+
+    {% for listing in listings %}
+    <div class="container">
+        <div class="row">
+            <div class="col-5">
+                <h2><a href="{% url 'auction' listing.id %}">{{ listing.product }}</a></h2>
+                <p>{{ listing.description }}</p>
+                {% if listing.currentbid > listing.startingbid %}
+                    <h4>${{ listing.currentbid }}</h4>
+                {% else %}    
+                    <h4>${{ listing.startingbid }}</h4>
+                {% endif %}
+                <h5>Category: <a href="{% url 'categories' listing.category %}">{{ listing.category }}</a></h5>
+            </div>
+            <div class="col-4">
+                <a href="{% url 'auction' listing.id %}"><img  width="70%" height="90%" class="product" src="{{listing.image}}" alt="{{ listing.product }}"></a>
+            </div>
+        </div>
+    </div>    
+    {% endfor %}
+{% endblock %}

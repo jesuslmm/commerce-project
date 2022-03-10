@@ -1,0 +1,16 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="alert alert-success" role="alert">
+        You won this auction!
+  </div>
+    <h2>{{ auction.product }}</h2>
+    <p>Category: <a href="{% url 'categories' auction.category %}"></a>{{ listing.category }}</p>
+    <img src="{{ auction.image }}" alt="{{ auction.product }}">
+    <p>{{ auction.description }}</p>
+    {% if auction.currentbid >= auction.startingbid %}
+        <p>{{ auction.currentbid }}</p>
+    {% else %}
+        <p>{{ auction.startingbid }}</p>
+    {% endif %}
+{% endblock %}

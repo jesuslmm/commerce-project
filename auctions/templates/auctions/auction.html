@@ -1,0 +1,109 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {% if user.is_authenticated %}
+    {% if auction.seller == user %}
+    <div class="container mt-5">
+        <button type="button" class="btn btn-danger wlb" data-bs-toggle="modal" data-bs-target="#myModal">Finish this auction</button>
+        <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="modal-title" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="">Finish auction</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to finish this auction?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>                        
+                        <form action="{% url 'finish' auction.id %}">
+                            <input type="hidden" value="finish">
+                            <button type="submit" class="btn btn-warning">Finish</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
+    {% if user.is_authenticated %}
+        {% if auction.seller != user %}
+            {% if watcher %}
+            <div>
+                <form action="{% url 'delete_watchlist' auction.id %}">
+                    <input type="hidden" value="add">
+                    <button type="submit" class="btn btn-outline-warning wlb">Delete from Watchlist</button>
+                </form>
+            </div>
+            {% else %}
+            <div>
+                <form action="{% url 'addwatchlist' auction.id %}">
+                    <input type="hidden" value="add">
+                    <button type="submit" class="btn btn-outline-info wlb">Add to my watchlist</button>
+                </form>
+            </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <h2>{{ auction.product }}</h2>
+                <img src="{{ auction.image }}" alt="{{ auction.product }}">
+                <p>{{ auction.description }}</p>
+            </div>
+            <div class="col-3">
+                {% if error %}
+                <p class="card-text">
+                <div class="alert alert-warning" role="alert">Your bid must be bigger than the actual bid</div>
+                </p>
+                {% endif %}
+            <div class="square">
+                    <div class="content">
+                    {% if auction.currentbid >= auction.startingbid %}
+                        <p class="number">Actual bid: ${{ auction.currentbid }}</p>
+                    {% else %}
+                        <p class="number">Actual bid: ${{ auction.startingbid }}</p>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                    {% if auction.seller != user %}
+                        <form action="{% url 'auction' auction.id %}" method="post">
+                            {% csrf_token %}   
+                            {{ form }}
+                            <button type="submit" class="btn btn-outline-primary btmm">Make bid</button>                        </form>
+                        {% if user == buyer %}
+                        <div class="alert alert-info alert1" role="alert">
+                            Your bid is the current bid.
+                        </div>        
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>        
+    {% if user.is_authenticated %}
+        {% if auction.seller != user %}
+        <p class="mc">Make a comment:</p>
+        <form action="{% url 'makecomment' auction.id %}" method="post">
+            {% csrf_token %}   
+            {{ commentform }}
+            <button type="submit" class="btn btn-outline-primary btq">Comment</button>                        
+        </form>
+        {% endif %}
+        <div class="container">
+        {% for comment in commentbox %}
+            <div class="row">
+                <div class="col-6">
+                    <p class="cmb">{{ comment.writer }}:</p>
+                        <p class="msg">{{ comment.comment }}</p>
+                    <hr class="wr">
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
