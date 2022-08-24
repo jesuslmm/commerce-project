@@ -80,8 +80,8 @@ def auction(request, listing_id):
                 
     else:
         try:
-             bid = bids.objects.get(listing = auction)
-        except bid.DoesNotExist:
+             bid = bids.objects.filter(listing = auction)[0]
+        except: 
             return render(request, "auctions/auction.html", {
                 "auction": auction,
                 "form": newoffer(),
@@ -176,7 +176,7 @@ def finish(request, listing_id):
     auction = auction_listings.objects.get(pk = listing_id)
     bid = bids()
     try:
-        bid = bids.objects.get(listing = auction)
+        bid = bids.objects.filter(listing = auction).last()
     except bid.DoesNotExist:
         auction.finished = True
         auction.save()
@@ -189,7 +189,7 @@ def finish(request, listing_id):
 
 
 def categorie(request, listing_category):
-    auction = auction_listings.objects.filter(category = listing_category, finsihed = False)
+    auction = auction_listings.objects.filter(category = listing_category, finished = False)
     return render(request, "auctions/categories.html", {
         "listings": auction,
         "category": listing_category
